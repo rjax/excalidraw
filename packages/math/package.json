@@ -51,7 +51,7 @@
     ]
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": "https://github.com/rjax/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
     "build:esm": "rm -rf dist && node ../../scripts/buildMath.js && yarn gen:types"

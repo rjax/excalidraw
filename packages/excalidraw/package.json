@@ -113,7 +113,7 @@
     "jest-diff": "29.7.0",
     "typescript": "4.9.4"
   },
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": "https://github.com/rjax/excalidraw",
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
