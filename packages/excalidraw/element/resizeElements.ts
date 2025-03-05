@@ -1382,8 +1382,9 @@ export const resizeMultipleElements = (
       targetElements.some(
         (item) =>
           item.latest.angle !== 0 ||
-          isTextElement(item.latest) ||
-          isInGroup(item.latest),
+          isTextElement(item.latest) 
+          // ||
+          // isInGroup(item.latest),
       );
 
     if (keepAspectRatio) {
