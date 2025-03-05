@@ -67,7 +67,7 @@
     "which": "4.0.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": "https://github.com/rjax/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
     "build:esm": "rimraf dist && node ../../scripts/buildUtils.js && yarn gen:types"

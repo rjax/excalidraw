@@ -66,7 +66,7 @@
       "last 1 safari version"
     ]
   },
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": "https://github.com/rjax/excalidraw",
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
