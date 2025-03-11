@@ -2265,6 +2265,11 @@ Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/
 
 - Bundle css files with js [#2819](https://github.com/excalidraw/excalidraw/pull/2819). The host would not need to import css files separately.
 
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
 ## 0.2.0
 
 ## Excalidraw API
