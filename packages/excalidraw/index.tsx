@@ -301,3 +301,4 @@ export { setCustomTextMetricsProvider } from "./element/textMeasurements";
 
 // rjax components
 export {LibraryUnit} from "./components/LibraryUnit";
+export {useLibraryItemSvg} from "./hooks/useLibraryItemSvg";
