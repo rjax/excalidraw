@@ -298,3 +298,6 @@ export { getDataURL } from "./data/blob";
 export { isElementLink } from "./element/elementLink";
 
 export { setCustomTextMetricsProvider } from "./element/textMeasurements";
+
+// rjax components
+export {LibraryUnit} from "./components/LibraryUnit";
