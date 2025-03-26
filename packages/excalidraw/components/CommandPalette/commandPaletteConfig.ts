@@ -118,7 +118,7 @@ export const EXCLUDED_COMMANDS: string[] = [
  */
 export const shouldIncludeCommand = (command: CommandPaletteItem): boolean => {
 
-    console.log(command);
+
     // Exclude by category
     if (EXCLUDED_CATEGORIES.includes(command.category)) {
         return false;

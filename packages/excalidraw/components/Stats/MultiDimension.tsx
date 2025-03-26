@@ -120,31 +120,84 @@ const resizeGroup = (
   latestElements: ExcalidrawElement[],
   originalElements: ExcalidrawElement[],
   originalElementsMap: ElementsMap,
-  scene: Scene,
+  preserveAspectRatio: boolean = false,
 ) => {
-  // keep aspect ratio for groups
-  if (property === "width") {
-    nextHeight = Math.round((nextWidth / aspectRatio) * 100) / 100;
-  } else {
-    nextWidth = Math.round(nextHeight * aspectRatio * 100) / 100;
+  // Get the initial width from the bounds
+  const [x1, y1, x2, y2] = getCommonBounds(originalElements);
+  const initialWidth = x2 - x1;
+  
+  // Only adjust height/width to maintain aspect ratio if preserveAspectRatio is true
+  if (preserveAspectRatio) {
+    if (property === "width") {
+      nextHeight = Math.round((nextWidth / aspectRatio) * 100) / 100;
+    } else {
+      nextWidth = Math.round(nextHeight * aspectRatio * 100) / 100;
+    }
   }
 
-  const scale = nextHeight / initialHeight;
-
+  // Calculate scale factors correctly - divide by the actual initial dimensions
+  const scaleX = nextWidth / initialWidth;
+  const scaleY = nextHeight / initialHeight;
+  
+  // For each element in the group, apply the appropriate scale
   for (let i = 0; i < originalElements.length; i++) {
     const origElement = originalElements[i];
     const latestElement = latestElements[i];
 
-    resizeElementInGroup(
-      anchor[0],
-      anchor[1],
-      property,
-      scale,
-      latestElement,
+    // Calculate the element's position relative to the anchor point
+    const offsetX = origElement.x - anchor[0];
+    const offsetY = origElement.y - anchor[1];
+    
+    // Scale the element's dimensions and position
+    const nextElementWidth = origElement.width * scaleX;
+    const nextElementHeight = origElement.height * scaleY;
+    const x = anchor[0] + offsetX * scaleX;
+    const y = anchor[1] + offsetY * scaleY;
+
+    const updates = {
+      width: nextElementWidth,
+      height: nextElementHeight,
+      x,
+      y,
+      ...rescalePointsInElement(origElement, nextElementWidth, nextElementHeight, false),
+      ...(isTextElement(origElement)
+        ? { fontSize: origElement.fontSize * (property === "width" ? scaleX : scaleY) }
+        : {}),
+    };
+
+    mutateElement(latestElement, updates, false);
+
+    const boundTextElement = getBoundTextElement(
       origElement,
       originalElementsMap,
       scene,
     );
+    
+    if (boundTextElement) {
+      // Scale font based on the dimension being changed
+      const newFontSize = boundTextElement.fontSize * (property === "width" ? scaleX : scaleY);
+      updateBoundElements(latestElement, elementsMap, {
+        newSize: { width: updates.width, height: updates.height },
+      });
+      
+      const latestBoundTextElement = elementsMap.get(boundTextElement.id);
+      if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
+        mutateElement(
+          latestBoundTextElement,
+          {
+            fontSize: newFontSize,
+          },
+          false,
+        );
+        
+        handleBindTextResize(
+          latestElement,
+          elementsMap,
+          property === "width" ? "e" : "s",
+          preserveAspectRatio,
+        );
+      }
+    }
   }
 };
 
@@ -198,7 +251,7 @@ const handleDimensionChange: DragInputCallbackType<
           latestElements,
           originalElements,
           originalElementsMap,
-          scene,
+          false
         );
       } else {
         const [el] = elementsInUnit;
