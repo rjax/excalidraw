@@ -72,7 +72,20 @@ import {
   useLibraryItemSvg,
 } from "../../hooks/useLibraryItemSvg";
 
+import { Ellipsify } from "../Ellipsify";
+
+import {
+  distributeLibraryItemsOnSquareGrid,
+  libraryItemsAtom,
+} from "../../data/library";
+
+import {
+  useLibraryCache,
+  useLibraryItemSvg,
+} from "../../hooks/useLibraryItemSvg";
+
 import * as defaultItems from "./defaultCommandPaletteItems";
+import { shouldIncludeCommand } from "./commandPaletteConfig";
 import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
@@ -347,12 +360,12 @@ function CommandPaletteInner({
             predicate: action.predicate
               ? action.predicate
               : (elements, appState, appProps, app) => {
-                  const selectedElements = getSelectedElements(
-                    elements,
-                    appState,
-                  );
-                  return selectedElements.length > 0;
-                },
+                const selectedElements = getSelectedElements(
+                  elements,
+                  appState,
+                );
+                return selectedElements.length > 0;
+              },
           }),
         ),
       );
@@ -518,10 +531,10 @@ function CommandPaletteInner({
 
           if (
             appProps.UIOptions.tools?.[
-              value as Extract<
-                typeof value,
-                keyof AppProps["UIOptions"]["tools"]
-              >
+            value as Extract<
+              typeof value,
+              keyof AppProps["UIOptions"]["tools"]
+            >
             ] === false
           ) {
             return acc;
@@ -612,17 +625,20 @@ function CommandPaletteInner({
         ...commandsFromActions,
         ...additionalCommands,
         ...(customCommandPaletteItems || []),
-      ].map((command) => {
-        return {
-          ...command,
-          icon: command.icon || boltIcon,
-          order: command.order ?? getCategoryOrder(command.category),
-          haystack: `${deburr(command.label.toLocaleLowerCase())} ${
-            command.keywords?.join(" ") || ""
-          }`,
-        };
-      });
+      ]
+        // Apply the filter to exclude commands
+        .filter(shouldIncludeCommand)
+        .map((command) => {
+          return {
+            ...command,
+            icon: command.icon || boltIcon,
+            order: command.order ?? getCategoryOrder(command.category),
+            haystack: `${deburr(command.label.toLocaleLowerCase())} ${command.keywords?.join(" ") || ""
+              }`,
+          };
+        });
 
+      console.log(allCommands.map((command) => command.label));
       setAllCommands(allCommands);
       setLastUsed(
         [...allCommands, ...libraryCommands].find(
@@ -685,11 +701,11 @@ function CommandPaletteInner({
 
       return typeof command.predicate === "function"
         ? command.predicate(
-            app.scene.getNonDeletedElements(),
-            uiAppState as AppState,
-            appProps,
-            app,
-          )
+          app.scene.getNonDeletedElements(),
+          uiAppState as AppState,
+          appProps,
+          app,
+        )
         : command.predicate === undefined || command.predicate;
     },
   );
@@ -855,8 +871,8 @@ function CommandPaletteInner({
         getNextCommandsByCategory(
           showLastUsed
             ? matchingCommands.filter(
-                (command) => command.label !== lastUsed?.label,
-              )
+              (command) => command.label !== lastUsed?.label,
+            )
             : matchingCommands,
         ),
       );
@@ -1007,7 +1023,7 @@ const CommandItem = ({
   appState: UIAppState;
   size?: "small" | "large";
 }) => {
-  const noop = () => {};
+  const noop = () => { };
 
   return (
     <div
