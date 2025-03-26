@@ -1,6 +1,6 @@
 {
   "name": "@rjax/excalidraw",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
