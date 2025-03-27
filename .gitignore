@@ -26,3 +26,6 @@ coverage
 dev-dist
 html
 meta*.json
+packages/excalidraw/features/componentLibrary/chat
+packages/excalidraw/features/componentLibrary/Chat-1.md
+migrate.scss.py
