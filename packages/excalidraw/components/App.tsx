@@ -737,6 +737,7 @@ class App extends React.Component<AppProps, AppState> {
         applyDeltas: this.applyDeltas,
         mutateElement: this.mutateElement,
         updateLibrary: this.library.updateLibrary,
+        addElementsFromPasteOrLibrary: this.addElementsFromPasteOrLibrary,
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
