@@ -125,7 +125,7 @@ const resizeGroup = (
   // Get the initial width from the bounds
   const [x1, y1, x2, y2] = getCommonBounds(originalElements);
   const initialWidth = x2 - x1;
-  
+
   // Only adjust height/width to maintain aspect ratio if preserveAspectRatio is true
   if (preserveAspectRatio) {
     if (property === "width") {
@@ -138,7 +138,7 @@ const resizeGroup = (
   // Calculate scale factors correctly - divide by the actual initial dimensions
   const scaleX = nextWidth / initialWidth;
   const scaleY = nextHeight / initialHeight;
-  
+
   // For each element in the group, apply the appropriate scale
   for (let i = 0; i < originalElements.length; i++) {
     const origElement = originalElements[i];
@@ -147,7 +147,7 @@ const resizeGroup = (
     // Calculate the element's position relative to the anchor point
     const offsetX = origElement.x - anchor[0];
     const offsetY = origElement.y - anchor[1];
-    
+
     // Scale the element's dimensions and position
     const nextElementWidth = origElement.width * scaleX;
     const nextElementHeight = origElement.height * scaleY;
@@ -159,9 +159,17 @@ const resizeGroup = (
       height: nextElementHeight,
       x,
       y,
-      ...rescalePointsInElement(origElement, nextElementWidth, nextElementHeight, false),
+      ...rescalePointsInElement(
+        origElement,
+        nextElementWidth,
+        nextElementHeight,
+        false,
+      ),
       ...(isTextElement(origElement)
-        ? { fontSize: origElement.fontSize * (property === "width" ? scaleX : scaleY) }
+        ? {
+            fontSize:
+              origElement.fontSize * (property === "width" ? scaleX : scaleY),
+          }
         : {}),
     };
 
@@ -172,14 +180,15 @@ const resizeGroup = (
       originalElementsMap,
       scene,
     );
-    
+
     if (boundTextElement) {
       // Scale font based on the dimension being changed
-      const newFontSize = boundTextElement.fontSize * (property === "width" ? scaleX : scaleY);
+      const newFontSize =
+        boundTextElement.fontSize * (property === "width" ? scaleX : scaleY);
       updateBoundElements(latestElement, elementsMap, {
         newSize: { width: updates.width, height: updates.height },
       });
-      
+
       const latestBoundTextElement = elementsMap.get(boundTextElement.id);
       if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
         mutateElement(
@@ -189,7 +198,7 @@ const resizeGroup = (
           },
           false,
         );
-        
+
         handleBindTextResize(
           latestElement,
           elementsMap,
@@ -251,7 +260,7 @@ const handleDimensionChange: DragInputCallbackType<
           latestElements,
           originalElements,
           originalElementsMap,
-          false
+          false,
         );
       } else {
         const [el] = elementsInUnit;

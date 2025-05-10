@@ -310,3 +310,11 @@ export { setCustomTextMetricsProvider } from "@excalidraw/element";
 
 // rjax components
 export {LibraryUnit} from "./components/LibraryUnit";
+
+
+export {
+  getSelectedElementsDimensions,
+  setSelectedElementsDimension,
+  setSelectedElementsWidth,
+  setSelectedElementsHeight,
+} from "./api/elementResizer";

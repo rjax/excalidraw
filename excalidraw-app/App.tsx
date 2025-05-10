@@ -141,8 +141,12 @@ import "./index.scss";
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
 
-import type { CollabAPI } from "./collab/Collab";
+import {
+  PortalComponent,
+  WidthControl,
+} from "./components/Custom/WidthControl";
 
+import type { CollabAPI } from "./collab/Collab";
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
