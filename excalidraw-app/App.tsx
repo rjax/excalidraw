@@ -137,8 +137,12 @@ import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
 
-import type { CollabAPI } from "./collab/Collab";
+import {
+  PortalComponent,
+  WidthControl,
+} from "./components/Custom/WidthControl";
 
+import type { CollabAPI } from "./collab/Collab";
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -897,7 +901,12 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
+        {excalidrawAPI && (
+          <AppFooter
+            onChange={() => excalidrawAPI?.refresh()}
+            excalidrawAPI={excalidrawAPI}
+          />
+        )}
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
@@ -1136,6 +1145,12 @@ const ExcalidrawWrapper = () => {
             ref={debugCanvasRef}
           />
         )}
+        <PortalComponent
+          targetSelector="div.App-toolbar-content"
+          observerSelector="#root"
+        >
+          {excalidrawAPI && <WidthControl excalidrawAPI={excalidrawAPI} />}
+        </PortalComponent>
       </Excalidraw>
     </div>
   );

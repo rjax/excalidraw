@@ -6,9 +6,16 @@ import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { DebugFooter, isVisualDebuggerEnabled } from "./DebugCanvas";
 import { EncryptedIcon } from "./EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./ExcalidrawPlusAppLink";
+import { WidthControl } from "./Custom/WidthControl";
 
 export const AppFooter = React.memo(
-  ({ onChange }: { onChange: () => void }) => {
+  ({
+    onChange,
+    excalidrawAPI,
+  }: {
+    onChange: () => void;
+    excalidrawAPI: any;
+  }) => {
     return (
       <Footer>
         <div
@@ -24,6 +31,13 @@ export const AppFooter = React.memo(
           ) : (
             <EncryptedIcon />
           )}
+          <WidthControl
+            onChange={(value) => {
+              // Add any additional handling here
+              onChange();
+            }}
+            excalidrawAPI={excalidrawAPI}
+          />
         </div>
       </Footer>
     );

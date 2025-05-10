@@ -302,4 +302,12 @@ export { setCustomTextMetricsProvider } from "./element/textMeasurements";
 
 // rjax components
 export { LibraryUnit } from "./components/LibraryUnit";
+export { duplicateElements } from "./element/newElement";
 export { useLibraryItemSvg, useLibraryCache } from "./hooks/useLibraryItemSvg";
+
+export {
+  getSelectedElementsDimensions,
+  setSelectedElementsDimension,
+  setSelectedElementsWidth,
+  setSelectedElementsHeight,
+} from "./api/elementResizer";
