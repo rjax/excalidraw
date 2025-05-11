@@ -13,6 +13,7 @@ import { pointFrom } from "@excalidraw/math";
 
 import type { AppClassProperties, AppState } from "../types";
 import type {
+  ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "../element/types";
@@ -140,8 +141,14 @@ class ElementResizer {
       const offsetY = element.y - anchor[1];
 
       // Scale dimensions and position
-      const nextElementWidth = Math.max(element.width * scaleX, MIN_WIDTH_OR_HEIGHT);
-      const nextElementHeight = Math.max(element.height * scaleY, MIN_WIDTH_OR_HEIGHT);
+      const nextElementWidth = Math.max(
+        element.width * scaleX,
+        MIN_WIDTH_OR_HEIGHT,
+      );
+      const nextElementHeight = Math.max(
+        element.height * scaleY,
+        MIN_WIDTH_OR_HEIGHT,
+      );
       const x = anchor[0] + offsetX * scaleX;
       const y = anchor[1] + offsetY * scaleY;
 
@@ -237,17 +244,21 @@ export function setSelectedElementsDimension(
   property: "width" | "height",
   value: number,
   options: ResizeOptions = {},
+  elementsToResize?: readonly ExcalidrawElement[],
 ): void {
-  const scene = app.scene;
-  const selectedElements = scene.getSelectedElements({
-    selectedElementIds: appState.selectedElementIds,
-    includeBoundTextElement: false,
-  });
+  // Use provided elements or fall back to current selection
+  const elements =
+    elementsToResize ||
+    app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: false,
+    });
 
-  if (
-    selectedElements.length === 0 ||
-    frameAndChildrenSelectedTogether(selectedElements)
-  ) {
+  // Check if elements still exist in the scene and update only valid ones
+  const currentElementsMap = app.scene.getNonDeletedElementsMap();
+  const validElements = elements.filter((el) => currentElementsMap.has(el.id));
+
+  if (validElements.length === 0) {
     return;
   }
 
@@ -256,13 +267,13 @@ export function setSelectedElementsDimension(
     ? getStepSizedValue(value, 10)
     : Math.round(value);
 
-  const elementsMap = scene.getNonDeletedElementsMap();
+  const elementsMap = app.scene.getNonDeletedElementsMap();
   const originalElementsMap = elementsMap;
 
   // Use a single resizer to handle all elements
   const resizer = new ElementResizer();
   resizer.resize(
-    selectedElements,
+    validElements,
     property,
     nextValue,
     options,
@@ -272,7 +283,7 @@ export function setSelectedElementsDimension(
   );
 
   // Trigger scene update
-  scene.triggerUpdate();
+  app.scene.triggerUpdate();
 }
 
 /**
@@ -283,8 +294,23 @@ export function setSelectedElementsWidth(
   appState: AppState,
   width: number,
   options: ResizeOptions = {},
+  selectedElements?: readonly ExcalidrawElement[],
 ): void {
-  setSelectedElementsDimension(app, appState, "width", width, options);
+  // Use provided elements or fall back to current selection
+  const elementsToResize =
+    selectedElements ||
+    app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: false,
+    });
+  setSelectedElementsDimension(
+    app,
+    appState,
+    "width",
+    width,
+    { ...options },
+    elementsToResize,
+  );
 }
 
 /**
@@ -293,8 +319,23 @@ export function setSelectedElementsWidth(
 export function setSelectedElementsHeight(
   app: AppClassProperties,
   appState: AppState,
-  height: number,
+  width: number,
   options: ResizeOptions = {},
+  selectedElements?: readonly ExcalidrawElement[],
 ): void {
-  setSelectedElementsDimension(app, appState, "height", height, options);
+  // Use provided elements or fall back to current selection
+  const elementsToResize =
+    selectedElements ||
+    app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: false,
+    });
+  setSelectedElementsDimension(
+    app,
+    appState,
+    "height",
+    width,
+    { ...options },
+    elementsToResize,
+  );
 }

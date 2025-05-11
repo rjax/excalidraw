@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useDevice } from "@excalidraw/excalidraw";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
 import {
   getSelectedElementsDimensions,
@@ -43,19 +44,25 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
   const app = useApp();
   const appState = useExcalidrawAppState();
   const isUserEditing = useRef(false);
+  const selectedElementsRef = useRef<ExcalidrawElement[]>([]);
 
   // Check if any elements are selected
-  const hasSelectedElements = Object.keys(appState.selectedElementIds).length > 0;
+  const hasSelectedElements =
+    Object.keys(appState.selectedElementIds).length > 0;
 
   // Get the relevant dimension from the selected elements or set empty string if none selected
-  const dimensions = hasSelectedElements ? getSelectedElementsDimensions(app, appState) : { width: 0, height: 0 };
+  const dimensions = hasSelectedElements
+    ? getSelectedElementsDimensions(app, appState)
+    : { width: 0, height: 0 };
   const dimensionValue =
     dimensionType === DimensionType.WIDTH
       ? dimensions.width
       : dimensions.height;
 
   // Use empty string when no elements are selected
-  const [value, setValue] = useState<string>(hasSelectedElements ? dimensionValue.toString() : "");
+  const [value, setValue] = useState<string>(
+    hasSelectedElements ? dimensionValue.toString() : "",
+  );
 
   // Default labels
   const defaultLabel = dimensionType === DimensionType.WIDTH ? "רוחב" : "אורך";
@@ -68,7 +75,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
         setValue("");
         return;
       }
-      
+
       const newDimensions = getSelectedElementsDimensions(app, appState);
       const newValue =
         dimensionType === DimensionType.WIDTH
@@ -77,7 +84,13 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 
       setValue(newValue.toString());
     }
-  }, [appState, appState.selectedElementIds, app, dimensionType, hasSelectedElements]);
+  }, [
+    appState,
+    appState.selectedElementIds,
+    app,
+    dimensionType,
+    hasSelectedElements,
+  ]);
 
   useEffect(() => {
     // This function will update the input when elements change
@@ -114,7 +127,16 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
     if (!isNaN(numericValue)) {
       // Enforce minimum dimensions
       numericValue = Math.max(numericValue, MIN_WIDTH_OR_HEIGHT);
-      
+
+      // Get the elements that were selected when editing began
+      const elementsToResize =
+        selectedElementsRef.current.length > 0
+          ? selectedElementsRef.current
+          : app.scene.getSelectedElements({
+              selectedElementIds: appState.selectedElementIds,
+              includeBoundTextElement: false,
+            });
+
       if (dimensionType === DimensionType.WIDTH) {
         setSelectedElementsWidth(
           app,
@@ -123,6 +145,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
           {
             preserveAspectRatio: false,
           },
+          elementsToResize, // Pass the stored elements
         );
       } else {
         setSelectedElementsHeight(
@@ -132,6 +155,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
           {
             preserveAspectRatio: false,
           },
+          elementsToResize, // Pass the stored elements
         );
       }
       onChange?.(numericValue.toString());
@@ -155,10 +179,10 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 
   return (
     <div style={{ flexGrow: 1 }}>
-      <label 
-        style={{ 
-          opacity: hasSelectedElements ? 1 : 0.5 
-        }} 
+      <label
+        style={{
+          opacity: hasSelectedElements ? 1 : 0.5,
+        }}
         htmlFor={`set-${dimensionType}`}
       >
         <span>{displayLabel}</span>
@@ -174,8 +198,12 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
           onKeyDown={handleKeyDown}
           onFocus={() => {
             isUserEditing.current = true;
+            selectedElementsRef.current = app.scene.getSelectedElements({
+              selectedElementIds: appState.selectedElementIds,
+              includeBoundTextElement: false,
+            });
           }}
-          disabled={!hasSelectedElements}
+          // disabled={!hasSelectedElements}
         />
       </label>
     </div>
