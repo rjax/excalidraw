@@ -103,20 +103,23 @@ class ElementResizer {
     const originalWidth = x2 - x1;
     const originalHeight = y2 - y1;
 
+    // Enforce minimum dimension value
+    const safeValue = Math.max(value, MIN_WIDTH_OR_HEIGHT);
+
     // Calculate scale factors
     const scaleFactor =
-      value / (property === "width" ? originalWidth : originalHeight);
+      safeValue / (property === "width" ? originalWidth : originalHeight);
 
     const newWidth =
       property === "width"
-        ? value
+        ? safeValue
         : options.preserveAspectRatio
         ? originalWidth * scaleFactor
         : originalWidth;
 
     const newHeight =
       property === "height"
-        ? value
+        ? safeValue
         : options.preserveAspectRatio
         ? originalHeight * scaleFactor
         : originalHeight;
@@ -137,8 +140,8 @@ class ElementResizer {
       const offsetY = element.y - anchor[1];
 
       // Scale dimensions and position
-      const nextElementWidth = element.width * scaleX;
-      const nextElementHeight = element.height * scaleY;
+      const nextElementWidth = Math.max(element.width * scaleX, MIN_WIDTH_OR_HEIGHT);
+      const nextElementHeight = Math.max(element.height * scaleY, MIN_WIDTH_OR_HEIGHT);
       const x = anchor[0] + offsetX * scaleX;
       const y = anchor[1] + offsetY * scaleY;
 
@@ -203,7 +206,7 @@ class ElementResizer {
 export function getSelectedElementsDimensions(
   app: AppClassProperties,
   appState: AppState,
-): { width: number | "Mixed"; height: number | "Mixed" } {
+): { width: number; height: number } {
   const scene = app.scene;
   const selectedElements = scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
@@ -219,30 +222,10 @@ export function getSelectedElementsDimensions(
     return measurer.getDimensions(selectedElements[0], appState);
   }
 
-  // Multiple elements case
-  const atomicUnits = getAtomicUnits(selectedElements, appState);
-  const elementsMap = scene.getNonDeletedElementsMap();
-
-  const widths: number[] = [];
-  const heights: number[] = [];
+  // For multiple elements, always use the bounding box dimensions
+  // instead of checking for "Mixed" values
   const groupMeasurer = new GroupElementMeasurer();
-
-  for (const atomicUnit of atomicUnits) {
-    const elementsInUnit = Object.keys(atomicUnit)
-      .map((id) => elementsMap.get(id)!)
-      .filter(Boolean);
-
-    if (elementsInUnit.length > 0) {
-      const dimensions = groupMeasurer.getDimensions(elementsInUnit);
-      widths.push(dimensions.width);
-      heights.push(dimensions.height);
-    }
-  }
-
-  return {
-    width: new Set(widths).size === 1 ? widths[0] : "Mixed",
-    height: new Set(heights).size === 1 ? heights[0] : "Mixed",
-  };
+  return groupMeasurer.getDimensions(selectedElements);
 }
 
 /**
