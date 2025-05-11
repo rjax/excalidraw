@@ -3464,4 +3464,17 @@ First release of `@excalidraw/excalidraw`## Excalidraw Library
 - Comment out Header component in HelpDialog
 
 ---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Add addElementsFromPasteOrLibrary method to ExcalidrawImperativeAPI
+
+### Fixes
+
+- Comment out Header component in HelpDialog
+
+---
 
