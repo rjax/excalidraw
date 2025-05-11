@@ -44,16 +44,18 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
   const appState = useExcalidrawAppState();
   const isUserEditing = useRef(false);
 
-  // Get the relevant dimension from the selected elements
-  const dimensions = getSelectedElementsDimensions(app, appState);
+  // Check if any elements are selected
+  const hasSelectedElements = Object.keys(appState.selectedElementIds).length > 0;
+
+  // Get the relevant dimension from the selected elements or set empty string if none selected
+  const dimensions = hasSelectedElements ? getSelectedElementsDimensions(app, appState) : { width: 0, height: 0 };
   const dimensionValue =
     dimensionType === DimensionType.WIDTH
       ? dimensions.width
       : dimensions.height;
 
-  const [value, setValue] = useState<string>(
-    dimensionValue === "Mixed" ? "Mixed" : dimensionValue.toString(),
-  );
+  // Use empty string when no elements are selected
+  const [value, setValue] = useState<string>(hasSelectedElements ? dimensionValue.toString() : "");
 
   // Default labels
   const defaultLabel = dimensionType === DimensionType.WIDTH ? "רוחב" : "אורך";
@@ -62,15 +64,20 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
   // Update dimensions when selection changes, but only if user isn't actively editing
   useEffect(() => {
     if (!isUserEditing.current) {
+      if (!hasSelectedElements) {
+        setValue("");
+        return;
+      }
+      
       const newDimensions = getSelectedElementsDimensions(app, appState);
       const newValue =
         dimensionType === DimensionType.WIDTH
           ? newDimensions.width
           : newDimensions.height;
 
-      setValue(newValue === "Mixed" ? "Mixed" : newValue.toString());
+      setValue(newValue.toString());
     }
-  }, [appState, appState.selectedElementIds, app, dimensionType]);
+  }, [appState, appState.selectedElementIds, app, dimensionType, hasSelectedElements]);
 
   useEffect(() => {
     // This function will update the input when elements change
@@ -82,7 +89,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
             ? newDimensions.width
             : newDimensions.height;
 
-        setValue(newValue === "Mixed" ? "Mixed" : newValue.toString());
+        setValue(newValue.toString());
       }
     };
 
@@ -136,22 +143,6 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
   const handleValueBlur = () => {
     isUserEditing.current = false;
     applyValueChange(); // Apply changes when focus is lost
-
-    // Reformat or reset the value if needed
-    const numericValue = parseFloat(value);
-    if (isNaN(numericValue) && value !== "Mixed") {
-      // Reset to current dimensions if invalid
-      const currentDimensions = getSelectedElementsDimensions(app, appState);
-      const currentValue =
-        dimensionType === DimensionType.WIDTH
-          ? currentDimensions.width
-          : currentDimensions.height;
-
-      setValue(currentValue === "Mixed" ? "Mixed" : currentValue.toString());
-    } else if (!isNaN(numericValue)) {
-      // Format to clean number
-      setValue(numericValue.toString());
-    }
   };
 
   // Handle keyboard events - apply changes on Enter key
@@ -164,15 +155,19 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 
   return (
     <div style={{ flexGrow: 1 }}>
-      <label style={{ marginRight: "0.5rem" }} htmlFor={`set-${dimensionType}`}>
+      <label 
+        style={{ 
+          opacity: hasSelectedElements ? 1 : 0.5 
+        }} 
+        htmlFor={`set-${dimensionType}`}
+      >
         <span>{displayLabel}</span>
         <input
           id={`set-${dimensionType}`}
-          type="text"
+          type="number"
           name={`set-${dimensionType}`}
-          placeholder={`${
-            dimensionType.charAt(0).toUpperCase() + dimensionType.slice(1)
-          }...`}
+          min={MIN_WIDTH_OR_HEIGHT}
+          step="1"
           value={value}
           onChange={handleValueChange}
           onBlur={handleValueBlur}
@@ -180,6 +175,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
           onFocus={() => {
             isUserEditing.current = true;
           }}
+          disabled={!hasSelectedElements}
         />
       </label>
     </div>
