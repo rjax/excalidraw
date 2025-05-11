@@ -14,6 +14,7 @@ import {
   useApp,
   useExcalidrawAppState,
 } from "../../../packages/excalidraw/components/App";
+import { MIN_WIDTH_OR_HEIGHT } from "../../../packages/excalidraw/constants";
 
 export enum DimensionType {
   WIDTH = "width",
@@ -102,8 +103,11 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 
   // Apply changes to the actual element
   const applyValueChange = () => {
-    const numericValue = parseFloat(value);
+    let numericValue = parseFloat(value);
     if (!isNaN(numericValue)) {
+      // Enforce minimum dimensions
+      numericValue = Math.max(numericValue, MIN_WIDTH_OR_HEIGHT);
+      
       if (dimensionType === DimensionType.WIDTH) {
         setSelectedElementsWidth(
           app,
@@ -123,7 +127,8 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
           },
         );
       }
-      onChange?.(value);
+      onChange?.(numericValue.toString());
+      setValue(numericValue.toString()); // Update the input to reflect minimum value if needed
     }
   };
 
