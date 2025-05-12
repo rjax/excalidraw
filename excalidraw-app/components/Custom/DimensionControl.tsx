@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import React, { useEffect, useState, useRef } from "react";
 
-import { useDevice } from "@excalidraw/excalidraw";
+import { useApp, useDevice } from "@excalidraw/excalidraw";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
@@ -11,10 +11,7 @@ import {
   setSelectedElementsWidth,
   setSelectedElementsHeight,
 } from "../../../packages/excalidraw/api/elementResizer";
-import {
-  useApp,
-  useExcalidrawAppState,
-} from "../../../packages/excalidraw/components/App";
+
 import { MIN_WIDTH_OR_HEIGHT } from "../../../packages/excalidraw/constants";
 
 export enum DimensionType {
@@ -42,7 +39,8 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 }) => {
   // Get current dimensions
   const app = useApp();
-  const appState = useExcalidrawAppState();
+  const appState = excalidrawAPI.getAppState();
+
   const isUserEditing = useRef(false);
   const selectedElementsRef = useRef<ExcalidrawElement[]>([]);
 
@@ -52,7 +50,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 
   // Get the relevant dimension from the selected elements or set empty string if none selected
   const dimensions = hasSelectedElements
-    ? getSelectedElementsDimensions(app, appState)
+    ? getSelectedElementsDimensions(app.scene, appState)
     : { width: 0, height: 0 };
   const dimensionValue =
     dimensionType === DimensionType.WIDTH
@@ -76,7 +74,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
         return;
       }
 
-      const newDimensions = getSelectedElementsDimensions(app, appState);
+      const newDimensions = getSelectedElementsDimensions(app.scene, appState);
       const newValue =
         dimensionType === DimensionType.WIDTH
           ? newDimensions.width
@@ -96,7 +94,10 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
     // This function will update the input when elements change
     const handleElementChange = () => {
       if (!isUserEditing.current) {
-        const newDimensions = getSelectedElementsDimensions(app, appState);
+        const newDimensions = getSelectedElementsDimensions(
+          app.scene,
+          appState,
+        );
         const newValue =
           dimensionType === DimensionType.WIDTH
             ? newDimensions.width
@@ -139,7 +140,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 
       if (dimensionType === DimensionType.WIDTH) {
         setSelectedElementsWidth(
-          app,
+          app.scene,
           excalidrawAPI.getAppState(),
           numericValue,
           {
@@ -149,7 +150,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
         );
       } else {
         setSelectedElementsHeight(
-          app,
+          app.scene,
           excalidrawAPI.getAppState(),
           numericValue,
           {

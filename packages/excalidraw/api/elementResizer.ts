@@ -11,7 +11,8 @@ import { getBoundTextElement } from "../element/textElement";
 import { updateBoundElements } from "../element/binding";
 import { pointFrom } from "@excalidraw/math";
 
-import type { AppClassProperties, AppState } from "../types";
+import type { AppState } from "../types";
+import type Scene from "../scene/Scene";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -209,12 +210,14 @@ class ElementResizer {
 
 /**
  * Get dimensions of selected elements
+ * @param scene The scene containing elements
+ * @param appState Current application state
+ * @returns Object containing width and height
  */
 export function getSelectedElementsDimensions(
-  app: AppClassProperties,
+  scene: Scene,
   appState: AppState,
 ): { width: number; height: number } {
-  const scene = app.scene;
   const selectedElements = scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
     includeBoundTextElement: false,
@@ -230,16 +233,21 @@ export function getSelectedElementsDimensions(
   }
 
   // For multiple elements, always use the bounding box dimensions
-  // instead of checking for "Mixed" values
   const groupMeasurer = new GroupElementMeasurer();
   return groupMeasurer.getDimensions(selectedElements);
 }
 
 /**
  * Set dimensions of selected elements
+ * @param scene The scene containing elements
+ * @param appState Current application state
+ * @param property Dimension property to modify (width or height)
+ * @param value New value for the dimension
+ * @param options Resizing options
+ * @param elementsToResize Optional specific elements to resize
  */
 export function setSelectedElementsDimension(
-  app: AppClassProperties,
+  scene: Scene,
   appState: AppState,
   property: "width" | "height",
   value: number,
@@ -249,13 +257,13 @@ export function setSelectedElementsDimension(
   // Use provided elements or fall back to current selection
   const elements =
     elementsToResize ||
-    app.scene.getSelectedElements({
+    scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: false,
     });
 
   // Check if elements still exist in the scene and update only valid ones
-  const currentElementsMap = app.scene.getNonDeletedElementsMap();
+  const currentElementsMap = scene.getNonDeletedElementsMap();
   const validElements = elements.filter((el) => currentElementsMap.has(el.id));
 
   if (validElements.length === 0) {
@@ -267,7 +275,7 @@ export function setSelectedElementsDimension(
     ? getStepSizedValue(value, 10)
     : Math.round(value);
 
-  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const elementsMap = scene.getNonDeletedElementsMap();
   const originalElementsMap = elementsMap;
 
   // Use a single resizer to handle all elements
@@ -283,14 +291,19 @@ export function setSelectedElementsDimension(
   );
 
   // Trigger scene update
-  app.scene.triggerUpdate();
+  scene.triggerUpdate();
 }
 
 /**
  * Set width of selected elements
+ * @param scene The scene containing elements
+ * @param appState Current application state
+ * @param width New width value
+ * @param options Resizing options
+ * @param selectedElements Optional specific elements to resize
  */
 export function setSelectedElementsWidth(
-  app: AppClassProperties,
+  scene: Scene,
   appState: AppState,
   width: number,
   options: ResizeOptions = {},
@@ -299,12 +312,12 @@ export function setSelectedElementsWidth(
   // Use provided elements or fall back to current selection
   const elementsToResize =
     selectedElements ||
-    app.scene.getSelectedElements({
+    scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: false,
     });
   setSelectedElementsDimension(
-    app,
+    scene,
     appState,
     "width",
     width,
@@ -315,26 +328,31 @@ export function setSelectedElementsWidth(
 
 /**
  * Set height of selected elements
+ * @param scene The scene containing elements
+ * @param appState Current application state
+ * @param height New height value
+ * @param options Resizing options
+ * @param selectedElements Optional specific elements to resize
  */
 export function setSelectedElementsHeight(
-  app: AppClassProperties,
+  scene: Scene,
   appState: AppState,
-  width: number,
+  height: number, // Fixed: renamed from width to height
   options: ResizeOptions = {},
   selectedElements?: readonly ExcalidrawElement[],
 ): void {
   // Use provided elements or fall back to current selection
   const elementsToResize =
     selectedElements ||
-    app.scene.getSelectedElements({
+    scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: false,
     });
   setSelectedElementsDimension(
-    app,
+    scene,
     appState,
     "height",
-    width,
+    height, // Using correct parameter name
     { ...options },
     elementsToResize,
   );

@@ -3500,4 +3500,47 @@ First release of `@excalidraw/excalidraw`## Excalidraw Library
 - Comment out Header component in HelpDialog
 
 ---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Enhance element resizing by allowing custom elements to be resized
+
+- Improve dimension control handling for selected elements
+
+- Enforce minimum dimensions for element resizing
+
+- Replace WidthControl with DimensionControl for element resizing
+
+- Add WidthControl component for resizing elements
+
+- Add addElementsFromPasteOrLibrary method to ExcalidrawImperativeAPI
+
+- Load old library if migration fails
+
+- Change LibraryPersistenceAdapter `load()` `source` -> `priority`
+
+- Allow `avif`, `jfif`, `webp`, `bmp`, `ico` image types (#6500
+
+- Horizontally center toolbar menu
+
+### Fixes
+
+- Comment out Header component in HelpDialog
+
+- Incorrectly duplicating items on paste/library insert (#6467
+
+- Utils leaking Scene state (#6461
+
+- Svg text baseline (#6285
+
+- No migrating `draw` lines correctly
+
+###  Refactor
+
+- Inline `SingleLibraryItem` into `PublishLibrary` (#6462
+
+---
 

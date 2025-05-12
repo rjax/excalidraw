@@ -311,3 +311,4 @@ export {
   setSelectedElementsWidth,
   setSelectedElementsHeight,
 } from "./api/elementResizer";
+export { useApp } from "./components/App";
