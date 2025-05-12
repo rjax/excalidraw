@@ -1,19 +1,18 @@
 import ReactDOM from "react-dom";
 import React, { useEffect, useState, useRef } from "react";
 
-import { useApp, useDevice } from "@excalidraw/excalidraw";
+import {
+  useApp,
+  useDevice,
+  getSelectedElementsDimensions,
+  setSelectedElementsWidth,
+  setSelectedElementsHeight,
+} from "@excalidraw/excalidraw";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
-import {
-  getSelectedElementsDimensions,
-  setSelectedElementsWidth,
-  setSelectedElementsHeight,
-} from "../../../packages/excalidraw/api/elementResizer";
-
-import { MIN_WIDTH_OR_HEIGHT } from "../../../packages/excalidraw/constants";
-
+const MIN_WIDTH_OR_HEIGHT = 1; // Minimum width or height for the input
 export enum DimensionType {
   WIDTH = "width",
   HEIGHT = "height",
@@ -40,6 +39,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
   // Get current dimensions
   const app = useApp();
   const appState = excalidrawAPI.getAppState();
+  const scene = app.scene; // Extract scene for clarity
 
   const isUserEditing = useRef(false);
   const selectedElementsRef = useRef<ExcalidrawElement[]>([]);
@@ -50,7 +50,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
 
   // Get the relevant dimension from the selected elements or set empty string if none selected
   const dimensions = hasSelectedElements
-    ? getSelectedElementsDimensions(app.scene, appState)
+    ? getSelectedElementsDimensions(scene, appState)
     : { width: 0, height: 0 };
   const dimensionValue =
     dimensionType === DimensionType.WIDTH
@@ -74,7 +74,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
         return;
       }
 
-      const newDimensions = getSelectedElementsDimensions(app.scene, appState);
+      const newDimensions = getSelectedElementsDimensions(scene, appState);
       const newValue =
         dimensionType === DimensionType.WIDTH
           ? newDimensions.width
@@ -85,7 +85,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
   }, [
     appState,
     appState.selectedElementIds,
-    app,
+    scene,
     dimensionType,
     hasSelectedElements,
   ]);
@@ -94,9 +94,19 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
     // This function will update the input when elements change
     const handleElementChange = () => {
       if (!isUserEditing.current) {
+        // Always use the latest app state for onChange events
+        const currentAppState = excalidrawAPI.getAppState();
+        const hasElements =
+          Object.keys(currentAppState.selectedElementIds).length > 0;
+
+        if (!hasElements) {
+          setValue("");
+          return;
+        }
+
         const newDimensions = getSelectedElementsDimensions(
-          app.scene,
-          appState,
+          scene,
+          currentAppState,
         );
         const newValue =
           dimensionType === DimensionType.WIDTH
@@ -113,13 +123,22 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
     return () => {
       unsubscribe();
     };
-  }, [app, appState, excalidrawAPI, dimensionType]);
+  }, [scene, excalidrawAPI, dimensionType]);
 
   // Only update the local state, don't apply changes yet
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setValue(newValue);
-    isUserEditing.current = true;
+
+    // This is where editing begins - capture selected elements now
+    if (!isUserEditing.current) {
+      isUserEditing.current = true;
+      // Store the current selection when user starts editing
+      selectedElementsRef.current = scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
+        includeBoundTextElement: false,
+      });
+    }
   };
 
   // Apply changes to the actual element
@@ -129,34 +148,34 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
       // Enforce minimum dimensions
       numericValue = Math.max(numericValue, MIN_WIDTH_OR_HEIGHT);
 
-      // Get the elements that were selected when editing began
+      // Get the elements that were selected when editing began or fall back to current selection
       const elementsToResize =
         selectedElementsRef.current.length > 0
           ? selectedElementsRef.current
-          : app.scene.getSelectedElements({
+          : scene.getSelectedElements({
               selectedElementIds: appState.selectedElementIds,
               includeBoundTextElement: false,
             });
 
       if (dimensionType === DimensionType.WIDTH) {
         setSelectedElementsWidth(
-          app.scene,
+          scene,
           excalidrawAPI.getAppState(),
           numericValue,
           {
             preserveAspectRatio: false,
           },
-          elementsToResize, // Pass the stored elements
+          elementsToResize,
         );
       } else {
         setSelectedElementsHeight(
-          app.scene,
+          scene,
           excalidrawAPI.getAppState(),
           numericValue,
           {
             preserveAspectRatio: false,
           },
-          elementsToResize, // Pass the stored elements
+          elementsToResize,
         );
       }
       onChange?.(numericValue.toString());
@@ -197,14 +216,7 @@ export const DimensionControl: React.FC<DimensionControlProps> = ({
           onChange={handleValueChange}
           onBlur={handleValueBlur}
           onKeyDown={handleKeyDown}
-          onFocus={() => {
-            isUserEditing.current = true;
-            selectedElementsRef.current = app.scene.getSelectedElements({
-              selectedElementIds: appState.selectedElementIds,
-              includeBoundTextElement: false,
-            });
-          }}
-          // disabled={!hasSelectedElements}
+          // Remove the onFocus handler - no need to update selectedElementsRef here
         />
       </label>
     </div>
