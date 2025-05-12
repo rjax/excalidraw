@@ -141,12 +141,6 @@ import "./index.scss";
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
 
-import {
-  DeviceType,
-  DimensionControl,
-  DimensionType,
-  PortalComponent,
-} from "./components/Custom/DimensionControl";
 
 import type { CollabAPI } from "./collab/Collab";
 polyfill();
@@ -345,7 +339,6 @@ const initializeScene = async (opts: {
 };
 
 const ExcalidrawWrapper = () => {
-  const device = useDevice();
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
@@ -920,7 +913,7 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
+        <AppFooter onChange={() => excalidrawAPI?.refresh()} excalidrawAPI={excalidrawAPI} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
