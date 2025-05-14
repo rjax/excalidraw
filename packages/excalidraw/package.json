@@ -24,6 +24,12 @@
       "development": "./dist/dev/components/ToolButton.js",
       "production": "./dist/prod/components/ToolButton.js",
       "default": "./dist/prod/components/ToolButton.js"
+    },
+    "./components/icons": {
+      "types": "./dist/types/excalidraw/components/icons.d.ts",
+      "development": "./dist/dev/components/icons.js",
+      "production": "./dist/prod/components/icons.js",
+      "default": "./dist/prod/components/icons.js"
     }
   },
   "files": [
