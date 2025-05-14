@@ -1,6 +1,6 @@
 {
   "name": "@rjax/excalidraw",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -18,6 +18,12 @@
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
+    },
+    "./components/ToolButton": {
+      "types": "./dist/types/excalidraw/components/ToolButton.d.ts",
+      "development": "./dist/dev/components/ToolButton.js",
+      "production": "./dist/prod/components/ToolButton.js",
+      "default": "./dist/prod/components/ToolButton.js"
     }
   },
   "files": [
