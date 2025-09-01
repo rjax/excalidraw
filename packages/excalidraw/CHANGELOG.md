@@ -2407,4 +2407,17 @@ First release of `@excalidraw/excalidraw`## Excalidraw Library
 **_This section lists the updates made to the excalidraw library and will not affect the integration._**
 
 ---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Fixes
+
+- Arrow conversion regression [#9241](https://github.com/excalidraw/excalidraw/pull/9241)
+
+###  Refactor
+
+- Auto ordered imports [#9163](https://github.com/excalidraw/excalidraw/pull/9163)
+
+---
 
