@@ -4,7 +4,7 @@ import percentages from "./locales/percentages.json";
 
 import type { NestedKeyOf } from "./utility-types";
 
-const COMPLETION_THRESHOLD = 85;
+const COMPLETION_THRESHOLD = 50; //85 reduced for cadli;
 
 export interface Language {
   code: string;
