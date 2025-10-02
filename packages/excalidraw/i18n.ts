@@ -6,7 +6,8 @@ import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
-const COMPLETION_THRESHOLD = 85;
+
+const COMPLETION_THRESHOLD = 50; //85 reduced for cadli;
 
 export interface Language {
   code: string;
