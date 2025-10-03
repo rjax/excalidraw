@@ -3735,4 +3735,35 @@ First release of `@excalidraw/excalidraw`## Excalidraw Library
 - Simplify scene handling in DimensionControl component
 
 ---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Enhance element resizing by allowing custom elements to be resized
+
+- Improve dimension control handling for selected elements
+
+- Enforce minimum dimensions for element resizing
+
+- Replace WidthControl with DimensionControl for element resizing
+
+- Add WidthControl component for resizing elements
+
+- Add addElementsFromPasteOrLibrary method to ExcalidrawImperativeAPI
+
+### Fixes
+
+- Lower completion threshold from 85 to 50 for language filtering
+
+- Update Hindi percentage to 100 in locales
+
+- Comment out Header component in HelpDialog
+
+###  Refactor
+
+- Simplify scene handling in DimensionControl component
+
+---
 
