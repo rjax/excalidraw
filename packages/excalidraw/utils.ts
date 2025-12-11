@@ -95,21 +95,34 @@ export const getFontFamilyString = ({
 }: {
   fontFamily: FontFamilyValues;
 }) => {
+  const resolveFontVar = (name: string, fallback: string) => {
+    // SSR / tests: no document → just use fallback
+    if (typeof document === "undefined" || !document.documentElement) {
+      return fallback;
+    }
+    // re-use existing helper; note: name without leading `--`
+    const value = getGlobalCSSVariable(name).trim();
+    return value || fallback;
+  };
+
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      // Base name that we’ll wrap in a CSS variable for key fonts
       let baseName = fontFamilyString;
 
-      // Map key logical fonts to CSS custom properties so the host app
-      // can plug in system-installed stacks (e.g. Hebrew-friendly fonts).
+      // Map logical fonts to host-controlled stacks via CSS variables,
+      // but resolve them here to a plain string so FontFaceSet APIs work.
       if (fontFamilyString === "Excalifont") {
-        baseName = `var(--excalidraw-font-hand-drawn, ${fontFamilyString})`;
+        baseName = resolveFontVar(
+          "excalidraw-font-hand-drawn",
+          fontFamilyString,
+        );
       } else if (fontFamilyString === "Nunito") {
-        baseName = `var(--excalidraw-font-normal, ${fontFamilyString})`;
+        baseName = resolveFontVar("excalidraw-font-normal", fontFamilyString);
       } else if (fontFamilyString === "Comic Shanns") {
-        baseName = `var(--excalidraw-font-code, ${fontFamilyString})`;
+        baseName = resolveFontVar("excalidraw-font-code", fontFamilyString);
       }
 
+      // Append existing fallbacks (e.g. Segoe UI Emoji)
       return `${baseName}${getFontFamilyFallbacks(id)
         .map((x) => `, ${x}`)
         .join("")}`;
