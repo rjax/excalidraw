@@ -1,3 +1,43 @@
+# Build & Deploy Cheat Sheet
+
+## Local development
+
+```bash
+cd <repo-root>           # c:/Users/rjax/source/repos/cadli-excalidraw
+yarn install             # once, or when deps change
+yarn start               # runs excalidraw-app via Vite dev server
+```
+
+## Production build (local)
+
+```bash
+cd <repo-root>
+yarn build               # builds app into excalidraw-app/build
+yarn start:production    # optional: serves built app on http://localhost:5001
+```
+
+## Deploy to Vercel (recommended)
+
+- Root directory: repo root (where `package.json` and `vercel.json` live).
+- Install command: `yarn install` (matches `vercel.json`).
+- Build command: `yarn build`.
+- Output directory: `excalidraw-app/build` (matches `vercel.json`).
+- After linking the project, deploy via Vercel dashboard or:
+
+```bash
+cd <repo-root>
+vercel --prod
+```
+
+## Build npm package (optional)
+
+```bash
+cd <repo-root>
+yarn build:package       # builds packages/excalidraw for consumption elsewhere
+```
+
+---
+
 rjax: @workspace How do I create scoped packages with yarn
 
 Workspace: Collecting workspace information`@workspace` accuracy and speed can be improved by building a remote workspace index. [Learn More](https://aka.ms/vscode-copilot-workspace-remote-index)

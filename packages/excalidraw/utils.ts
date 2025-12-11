@@ -96,13 +96,24 @@ export const getFontFamilyString = ({
   fontFamily: FontFamilyValues;
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
-    if (id === fontFamily) {
-      // TODO: we should fallback first to generic family names first
-      return `${fontFamilyString}${getFontFamilyFallbacks(id)
-        .map((x) => `, ${x}`)
-        .join("")}`;
-    }
+if (id === fontFamily) {
+  // Base name that we’ll wrap in a CSS variable for key fonts
+  let baseName = fontFamilyString;
+
+  // Map key logical fonts to CSS custom properties so the host app
+  // can plug in system-installed stacks (e.g. Hebrew-friendly fonts).
+  if (fontFamilyString === "Excalifont") {
+    baseName = `var(--excalidraw-font-hand-drawn, ${fontFamilyString})`;
+  } else if (fontFamilyString === "Nunito") {
+    baseName = `var(--excalidraw-font-normal, ${fontFamilyString})`;
+  } else if (fontFamilyString === "Comic Shanns") {
+    baseName = `var(--excalidraw-font-code, ${fontFamilyString})`;
   }
+
+  return `${baseName}${getFontFamilyFallbacks(id)
+    .map((x) => `, ${x}`)
+    .join("")}`;
+}  }
   return WINDOWS_EMOJI_FALLBACK_FONT;
 };
 

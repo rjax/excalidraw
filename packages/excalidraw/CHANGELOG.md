@@ -2420,4 +2420,9 @@ First release of `@excalidraw/excalidraw`## Excalidraw Library
 - Auto ordered imports [#9163](https://github.com/excalidraw/excalidraw/pull/9163)
 
 ---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
 
