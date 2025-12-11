@@ -96,7 +96,20 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      return `${fontFamilyString}${getFontFamilyFallbacks(id)
+      // Base name that we’ll wrap in a CSS variable for key fonts
+      let baseName = fontFamilyString;
+
+      // Map key logical fonts to CSS custom properties so the host app
+      // can plug in system-installed stacks (e.g. Hebrew-friendly fonts).
+      if (fontFamilyString === "Excalifont") {
+        baseName = `var(--excalidraw-font-hand-drawn, ${fontFamilyString})`;
+      } else if (fontFamilyString === "Nunito") {
+        baseName = `var(--excalidraw-font-normal, ${fontFamilyString})`;
+      } else if (fontFamilyString === "Comic Shanns") {
+        baseName = `var(--excalidraw-font-code, ${fontFamilyString})`;
+      }
+
+      return `${baseName}${getFontFamilyFallbacks(id)
         .map((x) => `, ${x}`)
         .join("")}`;
     }
@@ -386,8 +399,8 @@ export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: ((
     | {
-        type: ToolType;
-      }
+      type: ToolType;
+    }
     | { type: "custom"; customType: string }
   ) & { locked?: boolean; fromSelection?: boolean }) & {
     lastActiveToolBeforeEraser?: ActiveTool | null;
@@ -560,8 +573,8 @@ export const isTransparent = (color: string) => {
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
-    ? (value?: MaybePromise<Awaited<T>>) => void
-    : (value: MaybePromise<Awaited<T>>) => void;
+  ? (value?: MaybePromise<Awaited<T>>) => void
+  : (value: MaybePromise<Awaited<T>>) => void;
   reject: (error: Error) => void;
 };
 export const resolvablePromise = <T>() => {
@@ -836,9 +849,9 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
 
   return focusableElements
     ? Array.from(focusableElements).filter(
-        (element) =>
-          element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
-      )
+      (element) =>
+        element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
+    )
     : [];
 };
 
@@ -869,14 +882,14 @@ export const isShallowEqual = <
   comparators?:
     | { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
     | (keyof T extends K[number]
-        ? K extends readonly (keyof T)[]
-          ? K
-          : {
-              _error: "keys are either missing or include keys not in compared obj";
-            }
-        : {
-            _error: "keys are either missing or include keys not in compared obj";
-          }),
+      ? K extends readonly (keyof T)[]
+      ? K
+      : {
+        _error: "keys are either missing or include keys not in compared obj";
+      }
+      : {
+        _error: "keys are either missing or include keys not in compared obj";
+      }),
   debug = false,
 ) => {
   const aKeys = Object.keys(objA);
@@ -920,7 +933,7 @@ export const isShallowEqual = <
     const ret = comparator
       ? comparator(objA[key], objB[key])
       : objA[key] === objB[key] ||
-        _defaultIsShallowComparatorFallback(objA[key], objB[key]);
+      _defaultIsShallowComparatorFallback(objA[key], objB[key]);
 
     if (!ret && debug) {
       console.warn(
@@ -1030,8 +1043,8 @@ export const isMemberOf = <T extends string>(
   return collection instanceof Set || collection instanceof Map
     ? collection.has(value as T)
     : "includes" in collection
-    ? collection.includes(value as T)
-    : collection.hasOwnProperty(value);
+      ? collection.includes(value as T)
+      : collection.hasOwnProperty(value);
 };
 
 export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
@@ -1111,7 +1124,7 @@ export function addEventListener(
   options?: boolean | AddEventListenerOptions,
 ): UnsubscribeCallback {
   if (!target) {
-    return () => {};
+    return () => { };
   }
   target?.addEventListener?.(type, listener, options);
   return () => {
@@ -1164,9 +1177,9 @@ type HasBrand<T> = {
 
 type RemoveAllBrands<T> = HasBrand<T> extends true
   ? {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+  }
   : never;
 
 // adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
