@@ -1,11 +1,13 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import "@excalidraw/excalidraw/index.css";
+import "@rjax/excalidraw/index.css";
 
-import type * as TExcalidraw from "@excalidraw/excalidraw";
+import type * as TExcalidraw from "@rjax/excalidraw";
 
 import App from "./components/ExampleApp";
+
+// import "./index.css";
 
 declare global {
   interface Window {

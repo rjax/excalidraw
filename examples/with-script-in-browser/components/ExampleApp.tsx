@@ -8,12 +8,12 @@ import React, {
   cloneElement,
 } from "react";
 
-import type * as TExcalidraw from "@excalidraw/excalidraw";
-import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
+import type * as TExcalidraw from "@rjax/excalidraw";
+import type { ImportedLibraryData } from "@rjax/excalidraw/data/types";
 import type {
   NonDeletedExcalidrawElement,
   Theme,
-} from "@excalidraw/excalidraw/element/types";
+} from "@rjax/excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
@@ -22,7 +22,7 @@ import type {
   Gesture,
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
-} from "@excalidraw/excalidraw/types";
+} from "@rjax/excalidraw/types";
 
 import initialData from "../initialData";
 import {
@@ -40,6 +40,7 @@ import ExampleSidebar from "./sidebar/ExampleSidebar";
 import "./ExampleApp.scss";
 
 import type { ResolvablePromise } from "../utils";
+import { useTables } from "../pocs/useTables";
 
 type Comment = {
   x: number;
@@ -131,6 +132,8 @@ export default function ExampleApp({
 
   useHandleLibrary({ excalidrawAPI });
 
+  const { handleBOMClick } = useTables();
+
   useEffect(() => {
     if (!excalidrawAPI) {
       return;
@@ -183,7 +186,7 @@ export default function ExampleApp({
           elements: NonDeletedExcalidrawElement[],
           state: AppState,
         ) => {
-          console.info("Elements :", elements, "State : ", state);
+          // console.info("Elements :", elements, "State : ", state);
         },
         onPointerUpdate: (payload: {
           pointer: { x: number; y: number };
@@ -276,6 +279,12 @@ export default function ExampleApp({
           style={{ height: "2.5rem" }}
         >
           Click me
+        </button>
+        <button
+          onClick={() => handleBOMClick(excalidrawAPI)}
+          style={{ height: "2.5rem" }}
+        >
+          Insert BOM table
         </button>
       </>
     );
