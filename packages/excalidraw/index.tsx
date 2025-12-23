@@ -301,5 +301,6 @@ export { isElementLink } from "./element/elementLink";
 export { setCustomTextMetricsProvider } from "./element/textMeasurements";
 
 // rjax components
+export { getFontFamilyString } from "./utils";
 export { LibraryUnit } from "./components/LibraryUnit";
 export { useLibraryItemSvg, useLibraryCache } from "./hooks/useLibraryItemSvg";
