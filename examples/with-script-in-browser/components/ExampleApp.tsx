@@ -8,12 +8,12 @@ import React, {
   cloneElement,
 } from "react";
 
-import type * as TExcalidraw from "@excalidraw/excalidraw";
-import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
+import type * as TExcalidraw from "@rjax/excalidraw";
+import type { ImportedLibraryData } from "@rjax/excalidraw/data/types";
 import type {
   NonDeletedExcalidrawElement,
   Theme,
-} from "@excalidraw/excalidraw/element/types";
+} from "@rjax/excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
@@ -22,7 +22,7 @@ import type {
   Gesture,
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
-} from "@excalidraw/excalidraw/types";
+} from "@rjax/excalidraw/types";
 
 import initialData from "../initialData";
 import {
@@ -40,6 +40,7 @@ import ExampleSidebar from "./sidebar/ExampleSidebar";
 import "./ExampleApp.scss";
 
 import type { ResolvablePromise } from "../utils";
+import { useDimensions } from "./dimensions/useDimensions";
 
 type Comment = {
   x: number;
@@ -130,6 +131,9 @@ export default function ExampleApp({
   useCustom(excalidrawAPI, customArgs);
 
   useHandleLibrary({ excalidrawAPI });
+
+  const { handleWrapperClick } = useDimensions();
+
 
   useEffect(() => {
     if (!excalidrawAPI) {
@@ -406,12 +410,10 @@ export default function ExampleApp({
         { sceneX: commentIcons[id].x, sceneY: commentIcons[id].y },
         appstate,
       );
-      ele.style.left = `${
-        x - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetLeft
-      }px`;
-      ele.style.top = `${
-        y - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetTop
-      }px`;
+      ele.style.left = `${x - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetLeft
+        }px`;
+      ele.style.top = `${y - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetTop
+        }px`;
     });
   };
 
@@ -787,12 +789,12 @@ export default function ExampleApp({
             <div>y: {pointerData?.pointer.y ?? 0}</div>
           </div>
         </div>
-        <div className="excalidraw-wrapper">
+        <div className="excalidraw-wrapper"
+          onClick={(event) => handleWrapperClick(event, excalidrawAPI || null)}>
           {renderExcalidraw(children)}
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
         </div>
-
         <div className="export-wrapper button-wrapper">
           <label className="export-wrapper__checkbox">
             <input

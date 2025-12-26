@@ -1,5 +1,5 @@
-import type { ExcalidrawElementSkeleton } from "@excalidraw/excalidraw/data/transform";
-import type { FileId } from "@excalidraw/excalidraw/element/types";
+import type { ExcalidrawElementSkeleton } from "@rjax/excalidraw/data/transform";
+import type { FileId } from "@rjax/excalidraw/element/types";
 
 const elements: ExcalidrawElementSkeleton[] = [
   {
