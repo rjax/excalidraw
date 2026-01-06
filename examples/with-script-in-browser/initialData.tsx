@@ -1,5 +1,6 @@
 import type { ExcalidrawElementSkeleton } from "@rjax/excalidraw/data/transform";
 import type { FileId } from "@rjax/excalidraw/element/types";
+import { NormalizedZoomValue } from "@rjax/excalidraw/types";
 
 const elements: ExcalidrawElementSkeleton[] = [
   {
@@ -49,7 +50,11 @@ export default {
   appState: {
     viewBackgroundColor: "#AFEEEE",
     currentItemFontFamily: 5,
-    zoomStep: 0.01,
+    zoomStep: 0.02,
+    zoom: {
+      value: 0.5 as NormalizedZoomValue,
+    }
+
   },
   scrollToContent: true,
   libraryItems: [
