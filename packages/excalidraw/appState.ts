@@ -10,6 +10,7 @@ import {
   STATS_PANELS,
   THEME,
   DEFAULT_GRID_STEP,
+  ZOOM_STEP,
 } from "./constants";
 
 import type { AppState, NormalizedZoomValue } from "./types";
@@ -121,6 +122,7 @@ export const getDefaultAppState = (): Omit<
     isCropping: false,
     croppingElementId: null,
     searchMatches: [],
+    zoomStep: ZOOM_STEP,
   };
 };
 
@@ -233,6 +235,7 @@ const APP_STATE_STORAGE_CONF = (<
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
   zoom: { browser: true, export: false, server: false },
+  zoomStep: { browser: true, export: false, server: false },
   viewModeEnabled: { browser: false, export: false, server: false },
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },

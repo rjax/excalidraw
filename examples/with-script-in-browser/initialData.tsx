@@ -46,7 +46,11 @@ const elements: ExcalidrawElementSkeleton[] = [
 ];
 export default {
   elements,
-  appState: { viewBackgroundColor: "#AFEEEE", currentItemFontFamily: 5 },
+  appState: {
+    viewBackgroundColor: "#AFEEEE",
+    currentItemFontFamily: 5,
+    zoomStep: 0.01,
+  },
   scrollToContent: true,
   libraryItems: [
     [
