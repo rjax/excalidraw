@@ -59,8 +59,13 @@ function buildProd(config) {
 
 const createESMRawBuild = async () => {
   const chunksConfig = {
-    entryPoints: ["index.tsx", "**/*.chunk.ts"],
-    entryNames: "[name]",
+    entryPoints: [
+      "index.tsx", 
+      "**/*.chunk.ts",
+      "components/ToolButton.tsx", 
+      "components/icons.tsx"
+    ],
+    entryNames: "[dir]/[name]",
   };
 
   // development unminified build with source maps

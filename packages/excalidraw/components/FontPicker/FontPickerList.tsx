@@ -60,7 +60,7 @@ export const FontPickerList = React.memo(
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
     const { fonts } = useApp();
-    const { showDeprecatedFonts } = useAppProps();
+    const { showDeprecatedFonts, langCode, theme } = useAppProps();
 
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -71,10 +71,21 @@ export const FontPickerList = React.memo(
             ([_, { metadata }]) => !metadata.serverSide && !metadata.fallback,
           )
           .map(([familyId, { metadata, fontFaces }]) => {
+            // Derive the label from the resolved font stack so it matches
+            // the actual font used (including host-provided CSS overrides).
+            const resolvedFamily = getFontFamilyString({
+              fontFamily: familyId as FontFamilyValues,
+            });
+            const primaryName = resolvedFamily
+              .split(",")[0]
+              .trim()
+              .replace(/^"(.+)"$/, "$1");
+
             const fontDescriptor = {
               value: familyId,
               icon: metadata.icon ?? FontFamilyNormalIcon,
-              text: fontFaces[0]?.fontFace?.family ?? "Unknown",
+              text:
+                primaryName || fontFaces[0]?.fontFace?.family || "Unknown",
             };
 
             if (metadata.deprecated) {
@@ -92,7 +103,9 @@ export const FontPickerList = React.memo(
           .sort((a, b) =>
             a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
           ),
-      [],
+      // recompute when language or theme changes so labels match
+      // current CSS-driven font stacks
+      [langCode, theme],
     );
 
     const sceneFamilies = useMemo(

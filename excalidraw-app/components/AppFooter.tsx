@@ -8,7 +8,13 @@ import { EncryptedIcon } from "./EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./ExcalidrawPlusAppLink";
 
 export const AppFooter = React.memo(
-  ({ onChange }: { onChange: () => void }) => {
+  ({
+    onChange,
+    excalidrawAPI,
+  }: {
+    onChange: () => void;
+    excalidrawAPI: any;
+  }) => {
     return (
       <Footer>
         <div

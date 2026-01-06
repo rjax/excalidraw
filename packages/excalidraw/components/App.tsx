@@ -721,6 +721,7 @@ class App extends React.Component<AppProps, AppState> {
       const api: ExcalidrawImperativeAPI = {
         updateScene: this.updateScene,
         updateLibrary: this.library.updateLibrary,
+        addElementsFromPasteOrLibrary: this.addElementsFromPasteOrLibrary,
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
@@ -10953,7 +10954,8 @@ class App extends React.Component<AppProps, AppState> {
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey) {
         const sign = Math.sign(deltaY);
-        const MAX_STEP = ZOOM_STEP * 100;
+        const zoomStep = this.state.zoomStep > 0 ? this.state.zoomStep : ZOOM_STEP;
+        const MAX_STEP = Math.max(100 * zoomStep, 100 * ZOOM_STEP);
         const absDelta = Math.abs(deltaY);
         let delta = deltaY;
         if (absDelta > MAX_STEP) {

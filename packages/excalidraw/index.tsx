@@ -303,4 +303,13 @@ export { setCustomTextMetricsProvider } from "./element/textMeasurements";
 // rjax components
 export { getFontFamilyString } from "./utils";
 export { LibraryUnit } from "./components/LibraryUnit";
+export { duplicateElements } from "./element/newElement";
 export { useLibraryItemSvg, useLibraryCache } from "./hooks/useLibraryItemSvg";
+
+export {
+  getSelectedElementsDimensions,
+  setSelectedElementsDimension,
+  setSelectedElementsWidth,
+  setSelectedElementsHeight,
+} from "./api/elementResizer";
+export { useApp } from "./components/App";

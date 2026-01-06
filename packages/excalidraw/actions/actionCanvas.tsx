@@ -130,6 +130,7 @@ export const actionZoomIn = register({
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
+    const zoomStep = appState.zoomStep > 0 ? appState.zoomStep : ZOOM_STEP;
     return {
       appState: {
         ...appState,
@@ -137,7 +138,7 @@ export const actionZoomIn = register({
           {
             viewportX: appState.width / 2 + appState.offsetLeft,
             viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+            nextZoom: getNormalizedZoom(appState.zoom.value + zoomStep),
           },
           appState,
         ),
@@ -171,6 +172,7 @@ export const actionZoomOut = register({
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
+    const zoomStep = appState.zoomStep > 0 ? appState.zoomStep : ZOOM_STEP;
     return {
       appState: {
         ...appState,
@@ -178,7 +180,7 @@ export const actionZoomOut = register({
           {
             viewportX: appState.width / 2 + appState.offsetLeft,
             viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+            nextZoom: getNormalizedZoom(appState.zoom.value - zoomStep),
           },
           appState,
         ),
@@ -323,8 +325,10 @@ export const zoomToFitBounds = ({
     );
   }
 
+  const zoomStep = appState.zoomStep > 0 ? appState.zoomStep : ZOOM_STEP;
+
   const newZoomValue = getNormalizedZoom(
-    clamp(roundToStep(adjustedZoomValue, ZOOM_STEP, "floor"), minZoom, maxZoom),
+    clamp(roundToStep(adjustedZoomValue, zoomStep, "floor"), minZoom, maxZoom),
   );
 
   const centerScroll = centerScrollOn({

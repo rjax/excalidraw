@@ -2,7 +2,6 @@ const { execSync } = require("child_process");
 
 const excalidrawDir = `${__dirname}/../packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
-const pkg = require(excalidrawPackage);
 
 const publish = () => {
   try {
@@ -20,9 +19,22 @@ const publish = () => {
   }
 };
 
-const release = () => {
+const release = async (version) => {
+  if (version) {
+    console.info(`Running prerelease for version ${version}...`);
+    execSync(`node ${__dirname}/prerelease.js ${version}`, { stdio: 'inherit' });
+  }
+  
+  // Re-read package.json in case it was updated by prerelease
+  const pkg = require(excalidrawPackage);
   publish();
   console.info(`Published ${pkg.version}!`);
 };
 
-release();
+const nextVersion = process.argv.slice(2)[0];
+if (!nextVersion) {
+  console.error("Pass the next version to release!");
+  process.exit(1);
+}
+
+release(nextVersion);

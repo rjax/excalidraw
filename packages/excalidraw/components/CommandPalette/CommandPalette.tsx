@@ -55,6 +55,7 @@ import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { useStable } from "../../hooks/useStable";
 
 import * as defaultItems from "./defaultCommandPaletteItems";
+import { shouldIncludeCommand } from "./commandPaletteConfig";
 
 import "./CommandPalette.scss";
 
@@ -560,17 +561,21 @@ function CommandPaletteInner({
         ...commandsFromActions,
         ...additionalCommands,
         ...(customCommandPaletteItems || []),
-      ].map((command) => {
-        return {
-          ...command,
-          icon: command.icon || boltIcon,
-          order: command.order ?? getCategoryOrder(command.category),
-          haystack: `${deburr(command.label.toLocaleLowerCase())} ${
-            command.keywords?.join(" ") || ""
-          }`,
-        };
-      });
+      ]
+        // Apply the filter to exclude commands
+        .filter(shouldIncludeCommand)
+        .map((command) => {
+          return {
+            ...command,
+            icon: command.icon || boltIcon,
+            order: command.order ?? getCategoryOrder(command.category),
+            haystack: `${deburr(command.label.toLocaleLowerCase())} ${
+              command.keywords?.join(" ") || ""
+            }`,
+          };
+        });
 
+      console.log(allCommands.map((command) => command.label));
       setAllCommands(allCommands);
       setLastUsed(
         allCommands.find((command) => command.label === lastUsed?.label) ??

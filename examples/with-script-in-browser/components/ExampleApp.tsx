@@ -40,7 +40,6 @@ import ExampleSidebar from "./sidebar/ExampleSidebar";
 import "./ExampleApp.scss";
 
 import type { ResolvablePromise } from "../utils";
-import { useTables } from "../pocs/useTables";
 
 type Comment = {
   x: number;
@@ -131,8 +130,6 @@ export default function ExampleApp({
   useCustom(excalidrawAPI, customArgs);
 
   useHandleLibrary({ excalidrawAPI });
-
-  const { handleBOMClick } = useTables();
 
   useEffect(() => {
     if (!excalidrawAPI) {
@@ -280,12 +277,6 @@ export default function ExampleApp({
         >
           Click me
         </button>
-        <button
-          onClick={() => handleBOMClick(excalidrawAPI)}
-          style={{ height: "2.5rem" }}
-        >
-          Insert BOM table
-        </button>
       </>
     );
   };
@@ -415,12 +406,10 @@ export default function ExampleApp({
         { sceneX: commentIcons[id].x, sceneY: commentIcons[id].y },
         appstate,
       );
-      ele.style.left = `${
-        x - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetLeft
-      }px`;
-      ele.style.top = `${
-        y - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetTop
-      }px`;
+      ele.style.left = `${x - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetLeft
+        }px`;
+      ele.style.top = `${y - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetTop
+        }px`;
     });
   };
 
@@ -801,7 +790,6 @@ export default function ExampleApp({
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
         </div>
-
         <div className="export-wrapper button-wrapper">
           <label className="export-wrapper__checkbox">
             <input
