@@ -4671,4 +4671,13 @@ First release of `@excalidraw/excalidraw`## Excalidraw Library
 - Inline `SingleLibraryItem` into `PublishLibrary` (#6462
 
 ---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Add selection methods to ExcalidrawImperativeAPI and implement selection logic
+
+---
 
