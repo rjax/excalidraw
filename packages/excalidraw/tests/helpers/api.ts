@@ -136,8 +136,7 @@ export class API {
 
   static clearSelection = () => {
     act(() => {
-      // @ts-ignore
-      h.app.clearSelection(null);
+      h.app.clearSelection();
     });
     expect(API.getSelectedElements().length).toBe(0);
   };
@@ -470,7 +469,8 @@ export class API {
 
   static loadFile = async (filepath: string) => {
     const { base, ext } = path.parse(filepath);
-    return new File([await API.readFile(filepath, null)], base, {
+    const fileContents = new Uint8Array(await API.readFile(filepath, null));
+    return new File([fileContents], base, {
       type: getMimeType(ext),
     });
   };

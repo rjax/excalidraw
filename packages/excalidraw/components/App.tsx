@@ -720,6 +720,8 @@ class App extends React.Component<AppProps, AppState> {
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
         updateScene: this.updateScene,
+        selectElements: this.selectElements,
+        clearSelection: this.clearSelection,
         updateLibrary: this.library.updateLibrary,
         addElementsFromPasteOrLibrary: this.addElementsFromPasteOrLibrary,
         addFiles: this.addFiles,
@@ -3948,6 +3950,66 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  public selectElements = (
+    elementIds: ExcalidrawElement["id"][],
+    options: {
+      selectGroups?: boolean;
+      preservePreviousSelection?: boolean;
+      focus?: boolean;
+    } = {},
+  ) => {
+    const {
+      selectGroups = true,
+      preservePreviousSelection = true,
+      focus = false,
+    } = options;
+    const selectedElementIds = elementIds.reduce(
+      (acc, elementId) => {
+        acc[elementId] = true;
+        return acc;
+      },
+      {} as Record<ExcalidrawElement["id"], true>,
+    );
+
+    this.setState((prevState) => {
+      const nextSelectionState = selectGroups
+        ? selectGroupsForSelectedElements(
+            {
+              editingGroupId: prevState.editingGroupId,
+              selectedElementIds,
+            },
+            this.scene.getNonDeletedElements(),
+            prevState,
+            this,
+          )
+        : {
+            selectedElementIds: makeNextSelectedElementIds(
+              selectedElementIds,
+              prevState,
+            ),
+            selectedGroupIds: {},
+            editingGroupId: null,
+          };
+
+      return {
+        ...nextSelectionState,
+        previousSelectedElementIds: preservePreviousSelection
+          ? prevState.selectedElementIds
+          : {},
+        selectedLinearElement: null,
+        activeEmbeddable: null,
+      };
+    });
+
+    if (focus) {
+      this.focusContainer();
+    }
+  };
+
+  public clearSelection = withBatchedUpdates(() => {
+    this.deselectElements();
+  });
+
   private triggerRender = (
     /** force always re-renders canvas even if no change */
     force?: boolean,
@@ -7173,7 +7235,7 @@ class App extends React.Component<AppProps, AppState> {
           !event.shiftKey &&
           !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
         ) {
-          this.clearSelection(hitElement);
+          this.clearSelectionForHitElement(hitElement);
         }
 
         if (this.state.editingLinearElement) {
@@ -10179,7 +10241,9 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ suggestedBindings });
   };
 
-  private clearSelection(hitElement: ExcalidrawElement | null): void {
+  private clearSelectionForHitElement(
+    hitElement: ExcalidrawElement | null,
+  ): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
       activeEmbeddable: null,

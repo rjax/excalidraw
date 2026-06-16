@@ -13,11 +13,14 @@ import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   render,
   fireEvent,
+  act,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
   unmountComponent,
 } from "./test-utils";
+
+import type { ExcalidrawImperativeAPI } from "../types";
 
 unmountComponent();
 
@@ -37,6 +40,128 @@ beforeEach(() => {
 const { h } = window;
 
 const mouse = new Pointer("mouse");
+
+describe("imperative selection API", () => {
+  let excalidrawAPI: ExcalidrawImperativeAPI;
+
+  beforeEach(async () => {
+    unmountComponent();
+    await render(
+      <Excalidraw
+        excalidrawAPI={(api) => {
+          excalidrawAPI = api;
+        }}
+      />,
+    );
+  });
+
+  it("should expose selection methods on package API", () => {
+    expect(excalidrawAPI.selectElements).toBeDefined();
+    expect(excalidrawAPI.selectElements).toBe(h.app.selectElements);
+    expect(excalidrawAPI.clearSelection).toBeDefined();
+    expect(excalidrawAPI.clearSelection).toBe(h.app.clearSelection);
+  });
+
+  it("should select grouped elements using internal group selection logic", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      id: "rect1",
+      groupIds: ["outer", "inner"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      id: "rect2",
+      groupIds: ["outer", "inner"],
+    });
+    const rect3 = API.createElement({
+      type: "rectangle",
+      id: "rect3",
+    });
+
+    API.setElements([rect1, rect2, rect3]);
+
+    act(() => {
+      excalidrawAPI.selectElements([rect3.id], {
+        selectGroups: false,
+        preservePreviousSelection: false,
+      });
+    });
+
+    act(() => {
+      excalidrawAPI.selectElements([rect1.id]);
+    });
+
+    assertSelectedElements([rect1.id, rect2.id]);
+    expect(h.state.selectedGroupIds).toEqual({ inner: true });
+    expect(h.state.previousSelectedElementIds).toEqual({ [rect3.id]: true });
+  });
+
+  it("should support selecting elements without group expansion", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      id: "rect1",
+      groupIds: ["group"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      id: "rect2",
+      groupIds: ["group"],
+    });
+
+    API.setElements([rect1, rect2]);
+
+    act(() => {
+      excalidrawAPI.selectElements([rect1.id], { selectGroups: false });
+    });
+
+    assertSelectedElements([rect1.id]);
+    expect(h.state.selectedGroupIds).toEqual({});
+  });
+
+  it("should clear selected linear element state when selecting elements", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      id: "rect",
+    });
+
+    API.setElements([rect]);
+    API.setAppState({
+      selectedLinearElement: { elementId: "linear" } as any,
+    });
+
+    act(() => {
+      excalidrawAPI.selectElements([rect.id]);
+    });
+
+    expect(h.state.selectedLinearElement).toBeNull();
+  });
+
+  it("should clear selection through the imperative API", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      id: "rect1",
+      groupIds: ["group"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      id: "rect2",
+      groupIds: ["group"],
+    });
+
+    API.setElements([rect1, rect2]);
+
+    act(() => {
+      excalidrawAPI.selectElements([rect1.id]);
+    });
+    act(() => {
+      excalidrawAPI.clearSelection();
+    });
+
+    assertSelectedElements([]);
+    expect(h.state.selectedGroupIds).toEqual({});
+    expect(h.state.editingGroupId).toBeNull();
+  });
+});
 
 describe("box-selection", () => {
   beforeEach(async () => {
